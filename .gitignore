@@ -52,3 +52,7 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Qtcreator stuff
+build-LedBadgeQt-Desktop-Debug
+build-LedBadgeQt-Desktop-Release
