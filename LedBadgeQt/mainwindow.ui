@@ -6,15 +6,230 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1301</width>
+    <height>768</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>192</width>
+    <height>768</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>1301</width>
+      <height>631</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QFrame" name="frame">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Base">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>255</red>
+             <green>255</green>
+             <blue>255</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="Window">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Base">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>255</red>
+             <green>255</green>
+             <blue>255</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="Window">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>239</red>
+             <green>239</green>
+             <blue>239</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="Base">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="Window">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>0</green>
+             <blue>0</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
+       <property name="autoFillBackground">
+        <bool>true</bool>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabBadge">
+        <attribute name="title">
+         <string>Badge</string>
+        </attribute>
+        <widget class="QGroupBox" name="devGroupBox">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>181</width>
+           <height>121</height>
+          </rect>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="title">
+          <string>Connection</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <widget class="QComboBox" name="devComboBox">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>30</y>
+            <width>161</width>
+            <height>25</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QCheckBox" name="devShowAllCheckBox">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>90</y>
+            <width>161</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When unchecked, only &lt;span style=&quot; font-weight:700;&quot;&gt;ttyUSB&lt;/span&gt;&lt;span style=&quot; font-weight:700; font-style:italic;&quot;&gt;x&lt;/span&gt; devices will be shown.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Show all serial devices</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="devRefreshButton">
+          <property name="geometry">
+           <rect>
+            <x>100</x>
+            <y>60</y>
+            <width>71</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Refresh</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="devConnectButton">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>60</y>
+            <width>71</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Connect</string>
+          </property>
+         </widget>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="tabText">
+        <attribute name="title">
+         <string>Text</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1301</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuInfo">
+    <property name="title">
+     <string>Info</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuDebugging">
+    <property name="title">
+     <string>Debugging</string>
+    </property>
+    <addaction name="separator"/>
+   </widget>
+   <addaction name="menuDebugging"/>
+   <addaction name="menuInfo"/>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
