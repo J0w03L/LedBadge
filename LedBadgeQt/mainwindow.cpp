@@ -139,30 +139,45 @@ void MainWindow::on_queryPollInputsButton_clicked()
 
 void MainWindow::on_queryGetImageButton_clicked()
 {
-    plogf(ui->logTextBrowser, "NOTE: This function does not work correctly yet!");
     plogf(ui->logTextBrowser, "Getting screen image...");
-    uint8_t buf1;
-    uint8_t buf2;
-    uint8_t buf3[(B_WIDTH * B_HEIGHT) / 4];
-    if (int e = getPixelRect(&buf1, &buf2, buf3, 0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Front) != 0)
+    uint8_t buf1[((B_WIDTH * B_HEIGHT) / 4) + 2];
+    if (int e = getPixelRect(buf1, 0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Front) != 0)
     {
         plogf(ui->logTextBrowser, "Couldn't get screen image! (returned %i)", e);
         return;
     }
-    plogf(ui->logTextBrowser, "buf1 : 0x%02x | buf2: 0x%02x", buf1, buf2);
+    uint8_t buf2 = buf1[0];
+    uint8_t buf3 = buf1[1];
+    printf("buf2 : %i (0x%02x) | buf3: %i (0x%02x)\n", buf2, buf2, buf3, buf3);
+    char img[150] = "\0";
+    char blank[150] = "\0";
+
     for (int y = 0; y < 12; y++)
     {
         int x = 0;
         while (x < 12)
         {
-            for (int p = 0; p < 4; p++)
+            for (int p = 0; p < 8; p += 2)
             {
-                printf("%s", BIT_TEST(buf3[(y * 12) + x], p) ? "\u2588" : " ");
+                uint8_t val;
+                uint8_t bit1 = BIT_TEST(buf1[2 + (y * 12) + x], p) ? 1 : 0;
+                uint8_t bit2 = BIT_TEST(buf1[2 + (y * 12) + x], (p + 1)) ? 1 : 0;
+                switch (bit2)
+                {
+                    case 1:
+                        strncat(img, bit1 ? "\u2588" : "\u2593", 4); // 11 = Full Block; 10 = Dark Shade.
+                        break;
+                    case 0:
+                        strncat(img, bit1 ? "\u2592" : "\u2591", 4); // 01 = Medium Shade; 00 = Light Shade (to keep character spacing equal).
+                        break;
+                }
             }
             x++;
         }
-        printf("\n");
+        plogf(ui->logTextBrowser, img);
+        strncpy(img, blank, 150);
     }
+    plogf(ui->logTextBrowser, "Received screen image successfully!");
     return;
 }
 

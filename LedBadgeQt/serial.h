@@ -57,7 +57,6 @@ int openSerialDevice(const char* deviceName, QTextBrowser* logTextBrowser);
 int getVersion(uint8_t* buf);
 int pingDevice(uint8_t* buf);
 int pollInputs(uint8_t* buf);
-int getPixelRect(uint8_t* buf1, uint8_t* buf2, uint8_t* buf3, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target);
-//int DecodePixRect(uint8_t* buffer, int offset, int* width, uint* height, uint* bufferLength);
+int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target);
 
 #endif // SERIAL_H

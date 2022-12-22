@@ -17,7 +17,7 @@ I intend to at least try to bring some of the newer features over to this though
     - [ ] SetBrightness
     - [ ] SetPixel
     - [ ] GetPixel
-    - [ ] GetPixelRect
+    - [x] GetPixelRect
     - [ ] SolidFill
     - [ ] Fill
     - [ ] Copy

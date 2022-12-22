@@ -227,6 +227,7 @@
            <font>
             <family>Arial</family>
             <pointsize>9</pointsize>
+            <kerning>true</kerning>
            </font>
           </property>
           <property name="autoFillBackground">

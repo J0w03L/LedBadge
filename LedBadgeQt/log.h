@@ -6,6 +6,7 @@
 #include <QTextBrowser>
 
 void logf(QTextBrowser* logTextBrowser, const char* fmt, ...);
+void pllogf(QTextBrowser* logTextBrowser, const char* fmt, ...);
 void plogf(QTextBrowser* logTextBrowser, const char* fmt, ...);
 void clog(QTextBrowser* logTextBrowser);
 

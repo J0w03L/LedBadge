@@ -87,35 +87,22 @@ int pollInputs(uint8_t* buf)
     return read(serialDevice, buf, sizeof(buf));
 }
 
-/*
- * Currently this does not work correctly:
- *  - Most of the time too much data is read for buf1 and/or buf2.
- *  - Even when the correct amount of data is read for each buffer, the pixels are parsed incorrectly.
-*/
-int getPixelRect(uint8_t* buf1, uint8_t* buf2, uint8_t* buf3, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target)
+int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target)
 {
     printf("getPixelRect()\n");
     if (!(x >= 0 && x < B_WIDTH && width > 0 && (x + width) <= B_WIDTH && y >= 0 && y < B_HEIGHT && height > 0 && (y + height) <= B_HEIGHT)) // I really need to make an assert function bruh
     {
         return -1;
     }
-    uint8_t cmd1[1] = {SerialCommand::GetPixelRect | target};
-    uint8_t cmd2[1] = {x};
-    uint8_t cmd3[1] = {width};
-    uint8_t cmd4[1] = {(y << 4U) | height };
-    write(serialDevice, cmd1, sizeof(cmd1));
-    write(serialDevice, cmd2, sizeof(cmd2));
-    write(serialDevice, cmd3, sizeof(cmd3));
-    write(serialDevice, cmd4, sizeof(cmd4));
-    int buf1Read = read(serialDevice, buf1, sizeof(buf1));
-    int buf2Read = read(serialDevice, buf2, sizeof(buf2));
-    int buf3Read = 0;
     uint8_t tmp;
-    for (int i = 0; i < (width * height) / 4; i++)
+    uint8_t bufRead = 0;
+    uint8_t cmd[4] = {SerialCommand::GetPixelRect | target, x, width, (y << 4) | height};
+    write(serialDevice, cmd, sizeof(cmd));
+    for (int i = 0; i < ((width * height) / 4) + 2; i++)
     {
-        buf3Read += read(serialDevice, &tmp, sizeof(tmp));
-        buf3[i] = tmp;
+        bufRead += read(serialDevice, &tmp, sizeof(tmp));
+        buf[i] = tmp;
     }
-    printf("buf1Read : %i\nbuf2Read : %i\n buf3Read : %i\n", buf1Read, buf2Read, buf3Read);
+    printf("bufRead : %i\n", bufRead);
     return 0;
 }
