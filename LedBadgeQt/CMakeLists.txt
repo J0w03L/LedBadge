@@ -19,6 +19,9 @@ set(PROJECT_SOURCES
         mainwindow.ui
         serial.cpp
         serial.h
+        log.cpp
+        log.h
+        badge.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

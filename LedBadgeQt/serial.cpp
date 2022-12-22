@@ -2,20 +2,20 @@
 
 int serialDevice = 0;
 
-int openSerialDevice(const char* deviceName)
+int openSerialDevice(const char* deviceName, QTextBrowser* logTextBrowser)
 {
-    char devicePath[256] = {'/', 'd', 'e', 'v', '/', '\0'};
+    char devicePath[262] = "/dev/";
     strncat(devicePath, deviceName, 256);
     serialDevice = open(devicePath, O_RDWR);
     if (serialDevice < 0)
     {
-        printf("Error opening serial device at \"%s\": (%i) %s\n", devicePath, errno, strerror(errno));
+        plogf(logTextBrowser, "Error opening serial device at \"%s\": (%i) %s", devicePath, errno, strerror(errno));
         return -1;
     }
     struct termios2 tty;
     if (ioctl(serialDevice, TCGETS2, &tty) != 0)
     {
-        printf("Error getting attributes: (%i) %s\n", errno, strerror(errno));
+        plogf(logTextBrowser, "Error getting attributes: (%i) %s", errno, strerror(errno));
         return -2;
     }
 
@@ -36,7 +36,7 @@ int openSerialDevice(const char* deviceName)
     tty.c_iflag &= ~(IXON | IXOFF | IXANY);                                         // Disable software flow control.
     tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);    // Disable handling so we get raw bytes.
     tty.c_oflag &= ~(OPOST | ONLCR);                                                // Disable handling so we send raw bytes.
-    tty.c_cc[VTIME] = 80;                                                           // Wait to receive data for up to 8 seconds.
+    tty.c_cc[VTIME] = 50;                                                           // Wait to receive data for up to 5 seconds.
     tty.c_cc[VMIN] = 0;                                                             // Return all bytes received.
     tty.c_cflag &= ~CBAUD;                                                          // Baud speed bit mask.
     tty.c_cflag |= CBAUDEX;                                                         // Extra baud bit speed mask.
@@ -45,22 +45,77 @@ int openSerialDevice(const char* deviceName)
 
     if (ioctl(serialDevice, TCSETS2, &tty) != 0)
     {
-        printf("Error setting attributes: (%i) %s\n", errno, strerror(errno));
+        plogf(logTextBrowser, "Error setting attributes: (%i) %s", errno, strerror(errno));
         return -3;
     }
-    /*
 
     /*
      * Now we send the sync sequence
     */
-    printf("Sending sync sequence\n");
-    uint8_t syncSeq1[256] = {0};
-    uint8_t syncSeq2[1] = {2U << 4}; // GetVersion command.
+    plogf(logTextBrowser, "Sending sync sequence");
+    SerialCommand syncSeq1[256] = {SerialCommand::Nop};
     write(serialDevice, syncSeq1, sizeof(syncSeq1));
-    write(serialDevice, syncSeq2, sizeof(syncSeq2));
-    uint8_t verBuf[1] = {255}; // 255 is a placeholder value.
-    printf("Sending GetVersion\n");
-    int verRead = read(serialDevice, &verBuf, sizeof(verBuf));
-    printf("GetVersion result: %i (%02X)\n", verRead, verRead);
+    plogf(logTextBrowser, "Sending GetVersion");
+    uint8_t verBuf;
+    int verRead = getVersion(&verBuf);
+    plogf(logTextBrowser, "GetVersion result: %i (0x%02x, received %i bytes)", verBuf, verBuf, verRead);
+    if (verBuf == 255 || verBuf == 0) return -4;
+    return 0;
+}
+
+int getVersion(uint8_t* buf)
+{
+    printf("getVersion()\n");
+    SerialCommand cmd[1] = {SerialCommand::GetVersion};
+    write(serialDevice, cmd, sizeof(cmd));
+    return read(serialDevice, buf, sizeof(buf));
+}
+
+int pingDevice(uint8_t* buf)
+{
+    printf("pingDevice()\n");
+    SerialCommand cmd[1] = {SerialCommand::Ping};
+    write(serialDevice, cmd, sizeof(cmd));
+    return read(serialDevice, buf, sizeof(buf));
+}
+
+int pollInputs(uint8_t* buf)
+{
+    printf("pollInputs()\n");
+    SerialCommand cmd[1] = {SerialCommand::PollInputs};
+    write(serialDevice, cmd, sizeof(cmd));
+    return read(serialDevice, buf, sizeof(buf));
+}
+
+/*
+ * Currently this does not work correctly:
+ *  - Most of the time too much data is read for buf1 and/or buf2.
+ *  - Even when the correct amount of data is read for each buffer, the pixels are parsed incorrectly.
+*/
+int getPixelRect(uint8_t* buf1, uint8_t* buf2, uint8_t* buf3, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target)
+{
+    printf("getPixelRect()\n");
+    if (!(x >= 0 && x < B_WIDTH && width > 0 && (x + width) <= B_WIDTH && y >= 0 && y < B_HEIGHT && height > 0 && (y + height) <= B_HEIGHT)) // I really need to make an assert function bruh
+    {
+        return -1;
+    }
+    uint8_t cmd1[1] = {SerialCommand::GetPixelRect | target};
+    uint8_t cmd2[1] = {x};
+    uint8_t cmd3[1] = {width};
+    uint8_t cmd4[1] = {(y << 4U) | height };
+    write(serialDevice, cmd1, sizeof(cmd1));
+    write(serialDevice, cmd2, sizeof(cmd2));
+    write(serialDevice, cmd3, sizeof(cmd3));
+    write(serialDevice, cmd4, sizeof(cmd4));
+    int buf1Read = read(serialDevice, buf1, sizeof(buf1));
+    int buf2Read = read(serialDevice, buf2, sizeof(buf2));
+    int buf3Read = 0;
+    uint8_t tmp;
+    for (int i = 0; i < (width * height) / 4; i++)
+    {
+        buf3Read += read(serialDevice, &tmp, sizeof(tmp));
+        buf3[i] = tmp;
+    }
+    printf("buf1Read : %i\nbuf2Read : %i\n buf3Read : %i\n", buf1Read, buf2Read, buf3Read);
     return 0;
 }

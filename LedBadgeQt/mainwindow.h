@@ -20,6 +20,18 @@ private slots:
 
     void on_devConnectButton_clicked();
 
+    void on_logTestButton_clicked();
+
+    void on_logClearButton_clicked();
+
+    void on_queryPingButton_clicked();
+
+    void on_queryVersionButton_clicked();
+
+    void on_queryPollInputsButton_clicked();
+
+    void on_queryGetImageButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 };
