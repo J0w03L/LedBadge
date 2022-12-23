@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "serial.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,7 +33,16 @@ private slots:
 
     void on_queryGetImageButton_clicked();
 
+    void on_horizontalSlider_valueChanged(int value);
+
+    void on_bufferSwapButton_clicked();
+
+    void on_bufferGetFrontButton_clicked();
+
+    void on_bufferGetBackButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+    void getScreenBuffer(TargetBuffer target);
 };
 #endif // MAINWINDOW_H

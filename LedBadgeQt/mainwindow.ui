@@ -333,17 +333,116 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <string>Poll Inputs</string>
           </property>
          </widget>
-         <widget class="QPushButton" name="queryGetImageButton">
+        </widget>
+        <widget class="QGroupBox" name="outputGroupBox">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>130</y>
+           <width>181</width>
+           <height>111</height>
+          </rect>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="title">
+          <string>Output</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <widget class="QLabel" name="label">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>20</y>
+            <width>181</width>
+            <height>20</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Screen Brightness</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+         <widget class="QSlider" name="horizontalSlider">
+          <property name="geometry">
+           <rect>
+            <x>9</x>
+            <y>40</y>
+            <width>161</width>
+            <height>31</height>
+           </rect>
+          </property>
+          <property name="maximum">
+           <number>255</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="tickPosition">
+           <enum>QSlider::TicksBelow</enum>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QGroupBox" name="bufferGroupBox">
+         <property name="geometry">
+          <rect>
+           <x>370</x>
+           <y>0</y>
+           <width>171</width>
+           <height>241</height>
+          </rect>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="title">
+          <string>Buffers</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <widget class="QPushButton" name="bufferSwapButton">
           <property name="geometry">
            <rect>
             <x>10</x>
-            <y>120</y>
+            <y>30</y>
             <width>151</width>
             <height>25</height>
            </rect>
           </property>
           <property name="text">
-           <string>Get Image</string>
+           <string>Swap Front/Back</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="bufferGetFrontButton">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>60</y>
+            <width>71</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Get Front</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="bufferGetBackButton">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>60</y>
+            <width>71</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Get Back</string>
           </property>
          </widget>
         </widget>

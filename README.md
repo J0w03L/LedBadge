@@ -12,9 +12,9 @@ I intend to at least try to bring some of the newer features over to this though
  - [ ] Commands:
     - [x] Ping
     - [x] GetVersion
-    - [ ] Swap
+    - [x] Swap
     - [x] PollInputs
-    - [ ] SetBrightness
+    - [x] SetBrightness
     - [ ] SetPixel
     - [ ] GetPixel
     - [x] GetPixelRect

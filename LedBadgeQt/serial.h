@@ -34,7 +34,7 @@ enum SerialCommand : uint8_t
     Nop             = 0U  << 4,     // No Operation.
     Ping            = 1U  << 4,     // Ping the device.
     GetVersion      = 2U  << 4,     // Get the version of the device's firmware.
-    Swap            = 3U  << 4,     // Swap. Not sure what this does yet.
+    Swap            = 3U  << 4,     // Swaps the front/back buffers.
     PollInputs      = 4U  << 4,     // Check the state of the device's buttons.
     SetBrightness   = 5U  << 4,     // Set the device's screen brightness.
     SetPixel        = 6U  << 4,     // Set pixel state.
@@ -58,5 +58,7 @@ int getVersion(uint8_t* buf);
 int pingDevice(uint8_t* buf);
 int pollInputs(uint8_t* buf);
 int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target);
+int setBrightness(int brightness);
+int swapBuffers();
 
 #endif // SERIAL_H

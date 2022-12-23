@@ -106,3 +106,19 @@ int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t heig
     printf("bufRead : %i\n", bufRead);
     return 0;
 }
+
+int setBrightness(int brightness)
+{
+    printf("setBrightness()\n");
+    uint8_t cmd[2] = {SerialCommand::SetBrightness, static_cast<uint8_t>(brightness)};
+    write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
+
+int swapBuffers()
+{
+    printf("swapBuffers()\n");
+    uint8_t cmd[1] = {SerialCommand::Swap};
+    write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
