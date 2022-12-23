@@ -16,12 +16,12 @@ I intend to at least try to bring some of the newer features over to this though
     - [x] PollInputs
     - [x] SetBrightness
     - [x] SetPixel
-    - [ ] GetPixel (Implemented but broken in firmware?)
+    - [x] GetPixel
     - [x] GetPixelRect
-    - [ ] SolidFill
-    - [ ] Fill
+    - [x] SolidFill
+    - [x] Fill
     - [ ] Copy
-    - [ ] SetPowerOnImage
+    - [x] SetPowerOnImage
     - [ ] SetHoldTimings
 
 ### Windows

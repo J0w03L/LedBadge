@@ -144,7 +144,7 @@ int getPixel(uint8_t x, uint8_t y, TargetBuffer target)
     write(serialDevice, cmd, sizeof(cmd));
     int getRead = read(serialDevice, buf, sizeof(buf));
     printf("getRead = %i\n", getRead);
-    return buf[0];
+    return buf[0] & 0x3;
 }
 
 int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color)
@@ -156,15 +156,34 @@ int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color)
     return 0;
 }
 
-int clearBuffer(TargetBuffer target) // TODO: Use SolidFill or Fill for this instead!
+int solidFillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t color)
 {
-    printf("clearBuffer()\n");
-    for (int y = 0; y < 12; y++)
+    printf("solidFillRect()\n");
+    uint8_t cmd[4] = {SerialCommand::SolidFill | (target << 2) | color, x, width, (y << 4) | height};
+    write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
+
+int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t* buf, size_t len)
+{
+    printf("fillRect()\n");
+    uint8_t cmd[4 + len] = {SerialCommand::Fill | (target << 2), x, width, (y << 4) | height};
+    for (int i = 0; i < len; i++)
     {
-        for (int x = 0; x < 48; x++)
-        {
-            setPixel(x, y, target, 0);
-        }
+        uint8_t byte = buf[i];
+        // Swap some bits around.
+        byte = (byte & 0xF0) >> 4 | (byte & 0x0F) << 4;
+        byte = (byte & 0xCC) >> 2 | (byte & 0x33) << 2;
+        cmd[4 + i] = byte;
     }
+    write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
+
+int setPowerOnImage()
+{
+    printf("setPowerOnImage\n");
+    uint8_t cmd[1] = {SerialCommand::SetPowerOnImage};
+    write(serialDevice, cmd, sizeof(cmd));
     return 0;
 }

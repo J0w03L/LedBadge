@@ -178,6 +178,9 @@
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Refresh the list of serial devices.</string>
+          </property>
           <property name="text">
            <string>Refresh</string>
           </property>
@@ -190,6 +193,9 @@
             <width>71</width>
             <height>25</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>Connect to the selected serial device.</string>
           </property>
           <property name="text">
            <string>Connect</string>
@@ -258,6 +264,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Clear the logs.</string>
+          </property>
           <property name="text">
            <string>Clear Log</string>
           </property>
@@ -271,6 +280,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Log the currently-selected serial device for testing purposes.</string>
+          </property>
           <property name="text">
            <string>Test Log</string>
           </property>
@@ -282,7 +294,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
            <x>190</x>
            <y>0</y>
            <width>171</width>
-           <height>241</height>
+           <height>121</height>
           </rect>
          </property>
          <property name="autoFillBackground">
@@ -303,6 +315,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Ping the device and wait for a response.</string>
+          </property>
           <property name="text">
            <string>Ping</string>
           </property>
@@ -316,6 +331,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Get the device's firmware version.</string>
+          </property>
           <property name="text">
            <string>Firmware Version</string>
           </property>
@@ -328,6 +346,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <width>151</width>
             <height>25</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>Check the state of the device's buttons.</string>
           </property>
           <property name="text">
            <string>Poll Inputs</string>
@@ -362,7 +383,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
            </rect>
           </property>
           <property name="text">
-           <string>Screen Brightness</string>
+           <string>Display Brightness</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -376,6 +397,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <width>161</width>
             <height>31</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>Change the brightness of the device's display.</string>
           </property>
           <property name="maximum">
            <number>255</number>
@@ -393,7 +417,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <rect>
            <x>370</x>
            <y>0</y>
-           <width>171</width>
+           <width>331</width>
            <height>241</height>
           </rect>
          </property>
@@ -415,6 +439,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Swap the front and back buffers.</string>
+          </property>
           <property name="text">
            <string>Swap Front/Back</string>
           </property>
@@ -427,6 +454,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <width>71</width>
             <height>25</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>Get an image of the front buffer.</string>
           </property>
           <property name="text">
            <string>Get Front</string>
@@ -441,6 +471,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Get an image of the back buffer.</string>
+          </property>
           <property name="text">
            <string>Get Back</string>
           </property>
@@ -453,6 +486,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <width>31</width>
             <height>26</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>The shade to set a pixel as. 0: off, 1: light, 2: medium, 3: bright.</string>
           </property>
           <property name="maximum">
            <number>3</number>
@@ -467,6 +503,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>26</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>The X position to get/set a pixel at.</string>
+          </property>
           <property name="maximum">
            <number>47</number>
           </property>
@@ -480,6 +519,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>26</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>The Y position to get/set a pixel at.</string>
+          </property>
           <property name="maximum">
            <number>11</number>
           </property>
@@ -487,14 +529,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <widget class="QLabel" name="label_2">
           <property name="geometry">
            <rect>
-            <x>10</x>
+            <x>0</x>
             <y>120</y>
-            <width>31</width>
-            <height>17</height>
+            <width>51</width>
+            <height>16</height>
            </rect>
           </property>
           <property name="text">
-           <string>Color</string>
+           <string>Shade</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -541,6 +583,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Sets the shade of the pixel at [X, Y], on the target buffer.</string>
+          </property>
           <property name="text">
            <string>Set Pixel</string>
           </property>
@@ -554,6 +599,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Gets the shade of the pixel at [X, Y], on the target buffer.</string>
+          </property>
           <property name="text">
            <string>Get Pixel</string>
           </property>
@@ -566,6 +614,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <width>101</width>
             <height>25</height>
            </rect>
+          </property>
+          <property name="toolTip">
+           <string>The buffer to get/set a pixel from or to.</string>
           </property>
           <item>
            <property name="text">
@@ -603,6 +654,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Clear the front buffer.</string>
+          </property>
           <property name="text">
            <string>Clear Front</string>
           </property>
@@ -616,8 +670,62 @@ li.checked::marker { content: &quot;\2612&quot;; }
             <height>25</height>
            </rect>
           </property>
+          <property name="toolTip">
+           <string>Clear the back buffer.</string>
+          </property>
           <property name="text">
            <string>Clear Back</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="bufferDrawTestButton">
+          <property name="geometry">
+           <rect>
+            <x>170</x>
+            <y>30</y>
+            <width>151</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Draw a test image onto the screen.</string>
+          </property>
+          <property name="text">
+           <string>Draw Test</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QGroupBox" name="settingsGroupBox">
+         <property name="geometry">
+          <rect>
+           <x>190</x>
+           <y>130</y>
+           <width>171</width>
+           <height>111</height>
+          </rect>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="title">
+          <string>Settings</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <widget class="QPushButton" name="settingsSetPowerOnImageButton">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>30</y>
+            <width>151</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>Set the power-on image to what is currently shown on the device's display.</string>
+          </property>
+          <property name="text">
+           <string>Set Power On Image</string>
           </property>
          </widget>
         </widget>

@@ -215,7 +215,9 @@ void MainWindow::on_bufferGetPixelButton_clicked()
     uint8_t x = ui->bufferXSpinBox->value();
     uint8_t y = ui->bufferYSpinBox->value();
     TargetBuffer target = (strcmp(ui->bufferTargetComboBox->currentText().toLatin1().data(), "Front")) ? TargetBuffer::Back : TargetBuffer::Front;
-    uint8_t pixel = getPixel(x, y, target);
+    if (target == TargetBuffer::Front) swapBuffers();
+    uint8_t pixel = getPixel(x, y, TargetBuffer::Back);
+    if (target == TargetBuffer::Front) swapBuffers();
     plogf(ui->logTextBrowser, "Pixel at %i, %i in %s buffer is %i (0x%02x).", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", pixel, pixel);
     return;
 }
@@ -223,13 +225,13 @@ void MainWindow::on_bufferGetPixelButton_clicked()
 
 void MainWindow::on_bufferSetPixelButton_clicked()
 {
-    printf("Getting pixel...\n");
+    printf("Setting pixel...\n");
     uint8_t x = ui->bufferXSpinBox->value();
     uint8_t y = ui->bufferYSpinBox->value();
     uint8_t color = ui->bufferColorSpinBox->value();
     TargetBuffer target = (strcmp(ui->bufferTargetComboBox->currentText().toLatin1().data(), "Front")) ? TargetBuffer::Back : TargetBuffer::Front;
     if (target == TargetBuffer::Front) swapBuffers();
-    setPixel(x, y, target, color);
+    setPixel(x, y, TargetBuffer::Back, color);
     if (target == TargetBuffer::Front) swapBuffers();
     plogf(ui->logTextBrowser, "Set pixel at %i, %i in %s buffer to %i.", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", color);
     return;
@@ -238,18 +240,53 @@ void MainWindow::on_bufferSetPixelButton_clicked()
 
 void MainWindow::on_bufferClearFrontButton_clicked()
 {
-    printf("Clearing front buffer...\n");
-    swapBuffers();
-    clearBuffer(TargetBuffer::Front);
-    swapBuffers();
+    plogf(ui->logTextBrowser, "Clearing front buffer...");
+    swapBuffers(); // These commands only seem to work on the back buffer, so we move the front to the back.
+    solidFillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Front, 0);
+    swapBuffers(); // Now we move it back to the front.
+    plogf(ui->logTextBrowser, "Cleared front buffer!");
     return;
 }
 
 
 void MainWindow::on_bufferClearBackButton_clicked()
 {
-    printf("Clearing back buffer...\n");
-    clearBuffer(TargetBuffer::Back);
+    plogf(ui->logTextBrowser, "Clearing back buffer...");
+    solidFillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, 0);
+    plogf(ui->logTextBrowser, "Cleared back buffer!");
+    return;
+}
+
+
+void MainWindow::on_bufferDrawTestButton_clicked()
+{
+    plogf(ui->logTextBrowser, "Drawing test pattern...");
+    uint8_t buf[144] = {
+        0b00011011, 0b10010001, 0b10111001, 0b00011011, 0b10010001, 0b10111001, 0b00011011, 0b10010001, 0b10111001, 0b00011011, 0b10010001, 0b10111011,
+        0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000011,
+        0b00000000, 0b00000000, 0b00000000, 0b00110000, 0b00111100, 0b00000000, 0b00000000, 0b00001111, 0b00001111, 0b11000011, 0b00000000, 0b00000011,
+        0b01000000, 0b00110011, 0b00000000, 0b00000000, 0b11110011, 0b00000000, 0b00000000, 0b00111100, 0b11000000, 0b00110011, 0b00000000, 0b00000010,
+        0b01000000, 0b00110011, 0b00000000, 0b00110000, 0b11110011, 0b00110000, 0b00000011, 0b00111100, 0b11000000, 0b00110011, 0b00000000, 0b00000010,
+        0b01000000, 0b00000000, 0b00000000, 0b00110000, 0b11110011, 0b00110000, 0b00000011, 0b00111100, 0b11000000, 0b00110011, 0b00000000, 0b00000010,
+        0b10000000, 0b11000000, 0b11000000, 0b00110000, 0b11010111, 0b00110000, 0b00000011, 0b00110101, 0b11000011, 0b11000011, 0b00000000, 0b00000001,
+        0b10000000, 0b00111111, 0b00000000, 0b00110000, 0b11001111, 0b00110000, 0b11000011, 0b00110011, 0b11000000, 0b00110011, 0b00000000, 0b00000001,
+        0b10000000, 0b00000000, 0b00000000, 0b00110000, 0b11001111, 0b00110000, 0b11000011, 0b00110011, 0b11000000, 0b00110011, 0b00000000, 0b00000001,
+        0b11000000, 0b00000000, 0b00000000, 0b00110000, 0b11001111, 0b00001100, 0b11001100, 0b00110011, 0b11000000, 0b00110011, 0b00000000, 0b00000000,
+        0b11000000, 0b00000000, 0b00000000, 0b11000000, 0b00111100, 0b00000011, 0b00110000, 0b00001111, 0b00001111, 0b11000000, 0b11000000, 0b00000000,
+        0b11000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000,
+    };
+    fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
+    swapBuffers();
+    plogf(ui->logTextBrowser, "Finished drawing test pattern!");
+    return;
+}
+
+
+void MainWindow::on_settingsSetPowerOnImageButton_clicked()
+{
+    plogf(ui->logTextBrowser, "Setting power-on image...");
+    setPowerOnImage();
+    plogf(ui->logTextBrowser, "Set power-on image!");
     return;
 }
 

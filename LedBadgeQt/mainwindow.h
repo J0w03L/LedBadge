@@ -31,8 +31,6 @@ private slots:
 
     void on_queryPollInputsButton_clicked();
 
-    void on_queryGetImageButton_clicked();
-
     void on_horizontalSlider_valueChanged(int value);
 
     void on_bufferSwapButton_clicked();
@@ -48,6 +46,10 @@ private slots:
     void on_bufferClearFrontButton_clicked();
 
     void on_bufferClearBackButton_clicked();
+
+    void on_bufferDrawTestButton_clicked();
+
+    void on_settingsSetPowerOnImageButton_clicked();
 
 private:
     Ui::MainWindow *ui;
