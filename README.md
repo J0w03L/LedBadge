@@ -15,8 +15,8 @@ I intend to at least try to bring some of the newer features over to this though
     - [x] Swap
     - [x] PollInputs
     - [x] SetBrightness
-    - [ ] SetPixel
-    - [ ] GetPixel
+    - [x] SetPixel
+    - [ ] GetPixel (Implemented but broken in firmware?)
     - [x] GetPixelRect
     - [ ] SolidFill
     - [ ] Fill

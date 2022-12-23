@@ -41,6 +41,14 @@ private slots:
 
     void on_bufferGetBackButton_clicked();
 
+    void on_bufferGetPixelButton_clicked();
+
+    void on_bufferSetPixelButton_clicked();
+
+    void on_bufferClearFrontButton_clicked();
+
+    void on_bufferClearBackButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     void getScreenBuffer(TargetBuffer target);

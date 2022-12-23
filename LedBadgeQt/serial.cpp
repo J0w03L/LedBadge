@@ -90,10 +90,22 @@ int pollInputs(uint8_t* buf)
 int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target)
 {
     printf("getPixelRect()\n");
-    if (!(x >= 0 && x < B_WIDTH && width > 0 && (x + width) <= B_WIDTH && y >= 0 && y < B_HEIGHT && height > 0 && (y + height) <= B_HEIGHT)) // I really need to make an assert function bruh
+    uint8_t tmp;
+    uint8_t bufRead = 0;
+    uint8_t cmd[4] = {SerialCommand::GetPixelRect | target, x, width, (y << 4) | height};
+    write(serialDevice, cmd, sizeof(cmd));
+    for (int i = 0; i < ((width * height) / 4) + 2; i++)
     {
-        return -1;
+        bufRead += read(serialDevice, &tmp, sizeof(tmp));
+        buf[i] = tmp;
     }
+    printf("bufRead : %i\n", bufRead);
+    return 0;
+}
+
+int setPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t color)
+{
+    printf("setPixelRect()\n");
     uint8_t tmp;
     uint8_t bufRead = 0;
     uint8_t cmd[4] = {SerialCommand::GetPixelRect | target, x, width, (y << 4) | height};
@@ -120,5 +132,39 @@ int swapBuffers()
     printf("swapBuffers()\n");
     uint8_t cmd[1] = {SerialCommand::Swap};
     write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
+
+int getPixel(uint8_t x, uint8_t y, TargetBuffer target)
+{
+    printf("setPixel()\n");
+    printf("Getting pixel at %i, %i in %s buffer.\n", x, y, (target == TargetBuffer::Front) ? "Front" : "Back");
+    uint8_t cmd[3] = {SerialCommand::GetPixel, x, (y << 4) | (target << 2)};
+    uint8_t buf[1];
+    write(serialDevice, cmd, sizeof(cmd));
+    int getRead = read(serialDevice, buf, sizeof(buf));
+    printf("getRead = %i\n", getRead);
+    return buf[0];
+}
+
+int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color)
+{
+    printf("setPixel()\n");
+    printf("Setting pixel at %i, %i in %s buffer to %i.\n", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", color);
+    uint8_t cmd[3] = {SerialCommand::SetPixel, x, (y << 4) | (target << 2) | color};
+    write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
+
+int clearBuffer(TargetBuffer target) // TODO: Use SolidFill or Fill for this instead!
+{
+    printf("clearBuffer()\n");
+    for (int y = 0; y < 12; y++)
+    {
+        for (int x = 0; x < 48; x++)
+        {
+            setPixel(x, y, target, 0);
+        }
+    }
     return 0;
 }

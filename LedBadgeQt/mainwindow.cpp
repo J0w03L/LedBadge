@@ -207,3 +207,49 @@ void MainWindow::on_bufferSwapButton_clicked()
     swapBuffers();
     return;
 }
+
+
+void MainWindow::on_bufferGetPixelButton_clicked()
+{
+    printf("Getting pixel...\n");
+    uint8_t x = ui->bufferXSpinBox->value();
+    uint8_t y = ui->bufferYSpinBox->value();
+    TargetBuffer target = (strcmp(ui->bufferTargetComboBox->currentText().toLatin1().data(), "Front")) ? TargetBuffer::Back : TargetBuffer::Front;
+    uint8_t pixel = getPixel(x, y, target);
+    plogf(ui->logTextBrowser, "Pixel at %i, %i in %s buffer is %i (0x%02x).", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", pixel, pixel);
+    return;
+}
+
+
+void MainWindow::on_bufferSetPixelButton_clicked()
+{
+    printf("Getting pixel...\n");
+    uint8_t x = ui->bufferXSpinBox->value();
+    uint8_t y = ui->bufferYSpinBox->value();
+    uint8_t color = ui->bufferColorSpinBox->value();
+    TargetBuffer target = (strcmp(ui->bufferTargetComboBox->currentText().toLatin1().data(), "Front")) ? TargetBuffer::Back : TargetBuffer::Front;
+    if (target == TargetBuffer::Front) swapBuffers();
+    setPixel(x, y, target, color);
+    if (target == TargetBuffer::Front) swapBuffers();
+    plogf(ui->logTextBrowser, "Set pixel at %i, %i in %s buffer to %i.", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", color);
+    return;
+}
+
+
+void MainWindow::on_bufferClearFrontButton_clicked()
+{
+    printf("Clearing front buffer...\n");
+    swapBuffers();
+    clearBuffer(TargetBuffer::Front);
+    swapBuffers();
+    return;
+}
+
+
+void MainWindow::on_bufferClearBackButton_clicked()
+{
+    printf("Clearing back buffer...\n");
+    clearBuffer(TargetBuffer::Back);
+    return;
+}
+

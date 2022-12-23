@@ -60,5 +60,8 @@ int pollInputs(uint8_t* buf);
 int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target);
 int setBrightness(int brightness);
 int swapBuffers();
+int getPixel(uint8_t x, uint8_t y, TargetBuffer target);
+int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color);
+int clearBuffer(TargetBuffer target);
 
 #endif // SERIAL_H
