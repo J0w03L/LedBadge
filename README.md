@@ -16,7 +16,7 @@ An attempt at creating a cross-platform version of LedBadge using Qt6.
     - [x] GetPixelRect
     - [x] SolidFill
     - [x] Fill
-    - [ ] Copy
+    - [x] Copy
     - [x] SetPowerOnImage
     - [ ] SetHoldTimings
 
