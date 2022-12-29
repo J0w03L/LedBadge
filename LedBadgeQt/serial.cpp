@@ -188,7 +188,7 @@ int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer t
 int copyRect(uint8_t srcX, uint8_t srcY, uint8_t width, uint8_t height, uint8_t dstX, uint8_t dstY, TargetBuffer src, TargetBuffer dst)
 {
     printf("copyRect()\n");
-    uint8_t cmd[6] = {SerialCommand::Copy, srcX, dstX, (srcY << 4) | dstY, width, (height << 4) | (src << 2) | dst};
+    uint8_t cmd[6] = {SerialCommand::Copy, srcX, dstX, (srcY << 4) | dstY, width, (height << 4) | (dst << 2) | src}; // Not sure why, but the firmware seems to call the destination src and the source dst?
     write(serialDevice, cmd, sizeof(cmd));
     return 0;
 }
