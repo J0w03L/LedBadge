@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    registerLogTextBrowser(ui->logTextBrowser);
 }
 
 MainWindow::~MainWindow()
@@ -19,11 +20,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::getScreenBuffer(TargetBuffer target)
 {
-    plogf(ui->logTextBrowser, "Getting screen image...");
+    plogf("Getting screen image...");
     uint8_t buf1[((B_WIDTH * B_HEIGHT) / 4) + 2];
     if (int e = getPixelRect(buf1, 0, 0, B_WIDTH, B_HEIGHT, target) != 0)
     {
-        plogf(ui->logTextBrowser, "Couldn't get screen image! (returned %i)", e);
+        plogf("Couldn't get screen image! (returned %i)", e);
         return;
     }
     uint8_t buf2 = buf1[0];
@@ -54,16 +55,17 @@ void MainWindow::getScreenBuffer(TargetBuffer target)
             }
             x++;
         }
-        plogf(ui->logTextBrowser, img);
+        plogf(img);
         strncpy(img, blank, 150);
     }
-    plogf(ui->logTextBrowser, "Received screen image successfully!");
+    plogf("Received screen image successfully!");
     return;
 }
 
 void MainWindow::on_devRefreshButton_clicked()
 {
-    logf(ui->logTextBrowser, "Refreshing devices...");
+    closeSerialDevice();
+    logf("Refreshing devices...");
     SerialDevice *currentDevList = new SerialDevice[256];
     uint dev_count = 0;
     uint i = 0;
@@ -93,29 +95,29 @@ void MainWindow::on_devRefreshButton_clicked()
         ui->devComboBox->addItem(currentDeviceNames[x].c_str());
     }
     delete[] currentDevList;
-    logf(ui->logTextBrowser, "Refreshed devices!");
+    logf("Refreshed devices!");
     return;
 }
 
 void MainWindow::on_devConnectButton_clicked()
 {
-    // TODO: Disconnect previous connection if there was one?
+    closeSerialDevice();
     QString currentDeviceNameQString = ui->devComboBox->currentText();
     QByteArray currentDeviceNameQByteArray = currentDeviceNameQString.toLatin1();
     const char *currentDeviceName = currentDeviceNameQByteArray.data();
     if (currentDeviceName[0] == '\0')
     {
-        logf(ui->logTextBrowser, "Please select a device to connect to first!");
+        logf("Please select a device to connect to first!");
         return;
     }
-    plogf(ui->logTextBrowser, "Connecting to serial device...");
-    int e = openSerialDevice(currentDeviceName, ui->logTextBrowser);
+    plogf("Connecting to serial device...");
+    int e = openSerialDevice(currentDeviceName);
     if (e != 0)
     {
-        plogf(ui->logTextBrowser, "Could not connect to serial device! (openSerialDevice returned %i)", e);
+        plogf("Could not connect to serial device! (openSerialDevice returned %i)", e);
         return;
     }
-    plogf(ui->logTextBrowser, "Connected to serial device successfully!");
+    plogf("Connected to serial device successfully!");
     return;
 }
 
@@ -125,7 +127,7 @@ void MainWindow::on_logTestButton_clicked()
     printf("Printing test string to log.\n");
     char* currentDeviceName = ui->devComboBox->currentText().toLatin1().data();
     printf("currentDeviceName: '%s'\n", currentDeviceName);
-    logf(ui->logTextBrowser, "<span>Current selected device: <b>%s</b></span>", (currentDeviceName[0] != '\0') ? currentDeviceName : "None");
+    logf("<span>Current selected device: <b>%s</b></span>", (currentDeviceName[0] != '\0') ? currentDeviceName : "None");
 }
 
 
@@ -138,45 +140,45 @@ void MainWindow::on_logClearButton_clicked()
 
 void MainWindow::on_queryPingButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Pinging device...");
+    plogf("Pinging device...");
     uint8_t buf;
     int i = pingDevice(&buf);
     if (i == 0)
     {
-        plogf(ui->logTextBrowser, "Received no reply!");
+        plogf("Received no reply!");
         return;
     }
-    plogf(ui->logTextBrowser, "Received reply: %i (0x%02x)", buf, buf);
+    plogf("Received reply: %i (0x%02x)", buf, buf);
     return;
 }
 
 
 void MainWindow::on_queryVersionButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Querying firmware version...");
+    plogf("Querying firmware version...");
     uint8_t buf;
     int i = getVersion(&buf);
     if (i == 0)
     {
-        plogf(ui->logTextBrowser, "Couldn't query firmware version; received no reply!");
+        plogf("Couldn't query firmware version; received no reply!");
         return;
     }
-    plogf(ui->logTextBrowser, "Firmware Version: %i (0x%02x)", buf, buf);
+    plogf("Firmware Version: %i (0x%02x)", buf, buf);
     return;
 }
 
 
 void MainWindow::on_queryPollInputsButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Querying input states...");
+    plogf("Querying input states...");
     uint8_t buf;
     int i = pollInputs(&buf);
     if (i == 0)
     {
-        plogf(ui->logTextBrowser, "Couldn't query input states; received no reply!");
+        plogf("Couldn't query input states; received no reply!");
         return;
     }
-    plogf(ui->logTextBrowser, "K1: %i | K2: %i", BIT_TEST(buf, 0) ? 1 : 0, BIT_TEST(buf, 1) ? 1 : 0);
+    plogf("K1: %i | K2: %i", BIT_TEST(buf, 0) ? 1 : 0, BIT_TEST(buf, 1) ? 1 : 0);
     return;
 }
 
@@ -218,7 +220,7 @@ void MainWindow::on_bufferGetPixelButton_clicked()
     if (target == TargetBuffer::Front) swapBuffers();
     uint8_t pixel = getPixel(x, y, TargetBuffer::Back);
     if (target == TargetBuffer::Front) swapBuffers();
-    plogf(ui->logTextBrowser, "Pixel at %i, %i in %s buffer is %i (0x%02x).", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", pixel, pixel);
+    plogf("Pixel at %i, %i in %s buffer is %i (0x%02x).", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", pixel, pixel);
     return;
 }
 
@@ -233,34 +235,34 @@ void MainWindow::on_bufferSetPixelButton_clicked()
     if (target == TargetBuffer::Front) swapBuffers();
     setPixel(x, y, TargetBuffer::Back, color);
     if (target == TargetBuffer::Front) swapBuffers();
-    plogf(ui->logTextBrowser, "Set pixel at %i, %i in %s buffer to %i.", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", color);
+    plogf("Set pixel at %i, %i in %s buffer to %i.", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", color);
     return;
 }
 
 
 void MainWindow::on_bufferClearFrontButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Clearing front buffer...");
+    plogf("Clearing front buffer...");
     swapBuffers(); // These commands only seem to work on the back buffer, so we move the front to the back.
     solidFillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Front, 0);
     swapBuffers(); // Now we move it back to the front.
-    plogf(ui->logTextBrowser, "Cleared front buffer!");
+    plogf("Cleared front buffer!");
     return;
 }
 
 
 void MainWindow::on_bufferClearBackButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Clearing back buffer...");
+    plogf("Clearing back buffer...");
     solidFillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, 0);
-    plogf(ui->logTextBrowser, "Cleared back buffer!");
+    plogf("Cleared back buffer!");
     return;
 }
 
 
 void MainWindow::on_bufferDrawTestButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Drawing test pattern...");
+    plogf("Drawing test pattern...");
     uint8_t buf[144] = {
         0b00011011, 0b10010001, 0b10111001, 0b00011011, 0b10010001, 0b10111001, 0b00011011, 0b10010001, 0b10111001, 0b00011011, 0b10010001, 0b10111011,
         0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000000, 0b00000011,
@@ -277,16 +279,36 @@ void MainWindow::on_bufferDrawTestButton_clicked()
     };
     fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
     swapBuffers();
-    plogf(ui->logTextBrowser, "Finished drawing test pattern!");
+    plogf("Finished drawing test pattern!");
     return;
 }
 
 
 void MainWindow::on_settingsSetPowerOnImageButton_clicked()
 {
-    plogf(ui->logTextBrowser, "Setting power-on image...");
+    plogf("Setting power-on image...");
     setPowerOnImage();
-    plogf(ui->logTextBrowser, "Set power-on image!");
+    plogf("Set power-on image!");
+    return;
+}
+
+
+void MainWindow::on_bufferCopyFrontToBackButton_clicked()
+{
+    plogf("Copying front buffer to back...");
+    copyRect(0, 0, B_WIDTH, B_HEIGHT, 0, 0, TargetBuffer::Front, TargetBuffer::Back);
+    plogf("Copied front buffer to back!");
+    return;
+}
+
+
+void MainWindow::on_bufferCopyBackToFrontButton_clicked()
+{
+    plogf("Copying back buffer to front...");
+    swapBuffers();
+    copyRect(0, 0, B_WIDTH, B_HEIGHT, 0, 0, TargetBuffer::Front, TargetBuffer::Back);
+    swapBuffers();
+    plogf("Copied back buffer to front!");
     return;
 }
 

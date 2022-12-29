@@ -51,6 +51,10 @@ private slots:
 
     void on_settingsSetPowerOnImageButton_clicked();
 
+    void on_bufferCopyFrontToBackButton_clicked();
+
+    void on_bufferCopyBackToFrontButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     void getScreenBuffer(TargetBuffer target);

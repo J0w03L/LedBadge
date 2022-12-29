@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <QTextBrowser>
 
-void logf(QTextBrowser* logTextBrowser, const char* fmt, ...);
-void pllogf(QTextBrowser* logTextBrowser, const char* fmt, ...);
-void plogf(QTextBrowser* logTextBrowser, const char* fmt, ...);
-void clog(QTextBrowser* logTextBrowser);
+void registerLogTextBrowser(QTextBrowser* _);
+void logf(const char* fmt, ...);
+void pllogf(const char* fmt, ...);
+void plogf(const char* fmt, ...);
+void clog();
 
 #endif // LOG_H

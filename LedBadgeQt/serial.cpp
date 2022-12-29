@@ -2,20 +2,20 @@
 
 int serialDevice = 0;
 
-int openSerialDevice(const char* deviceName, QTextBrowser* logTextBrowser)
+int openSerialDevice(const char* deviceName)
 {
     char devicePath[262] = "/dev/";
     strncat(devicePath, deviceName, 256);
     serialDevice = open(devicePath, O_RDWR);
     if (serialDevice < 0)
     {
-        plogf(logTextBrowser, "Error opening serial device at \"%s\": (%i) %s", devicePath, errno, strerror(errno));
+        plogf("Error opening serial device at \"%s\": (%i) %s", devicePath, errno, strerror(errno));
         return -1;
     }
     struct termios2 tty;
     if (ioctl(serialDevice, TCGETS2, &tty) != 0)
     {
-        plogf(logTextBrowser, "Error getting attributes: (%i) %s", errno, strerror(errno));
+        plogf("Error getting attributes: (%i) %s", errno, strerror(errno));
         return -2;
     }
 
@@ -45,22 +45,27 @@ int openSerialDevice(const char* deviceName, QTextBrowser* logTextBrowser)
 
     if (ioctl(serialDevice, TCSETS2, &tty) != 0)
     {
-        plogf(logTextBrowser, "Error setting attributes: (%i) %s", errno, strerror(errno));
+        plogf("Error setting attributes: (%i) %s", errno, strerror(errno));
         return -3;
     }
 
     /*
      * Now we send the sync sequence
     */
-    plogf(logTextBrowser, "Sending sync sequence");
+    plogf("Sending sync sequence");
     SerialCommand syncSeq1[256] = {SerialCommand::Nop};
     write(serialDevice, syncSeq1, sizeof(syncSeq1));
-    plogf(logTextBrowser, "Sending GetVersion");
+    plogf("Sending GetVersion");
     uint8_t verBuf;
     int verRead = getVersion(&verBuf);
-    plogf(logTextBrowser, "GetVersion result: %i (0x%02x, received %i bytes)", verBuf, verBuf, verRead);
+    plogf("GetVersion result: %i (0x%02x, received %i bytes)", verBuf, verBuf, verRead);
     if (verBuf == 255 || verBuf == 0) return -4;
     return 0;
+}
+
+int closeSerialDevice()
+{
+    return close(serialDevice);
 }
 
 int getVersion(uint8_t* buf)
@@ -180,6 +185,14 @@ int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer t
     return 0;
 }
 
+int copyRect(uint8_t srcX, uint8_t srcY, uint8_t width, uint8_t height, uint8_t dstX, uint8_t dstY, TargetBuffer src, TargetBuffer dst)
+{
+    printf("copyRect()\n");
+    uint8_t cmd[6] = {SerialCommand::Copy, srcX, dstX, (srcY << 4) | dstY, width, (height << 4) | (src << 2) | dst};
+    write(serialDevice, cmd, sizeof(cmd));
+    return 0;
+}
+
 int setPowerOnImage()
 {
     printf("setPowerOnImage\n");
@@ -187,3 +200,5 @@ int setPowerOnImage()
     write(serialDevice, cmd, sizeof(cmd));
     return 0;
 }
+
+

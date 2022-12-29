@@ -1,9 +1,16 @@
 #include "log.h"
 
+QTextBrowser* logTextBrowser;
+void registerLogTextBrowser(QTextBrowser* _)
+{
+    logTextBrowser = _;
+    return;
+}
+
 /*
  * This is just a quick and dirty way to write output to logTextBrowser.
 */
-void logf(QTextBrowser* logTextBrowser, const char* fmt, ...)
+void logf(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -17,7 +24,7 @@ void logf(QTextBrowser* logTextBrowser, const char* fmt, ...)
 /*
  * This just does the same as logf, but outputs to both stdout and logTextBrowser.
 */
-void plogf(QTextBrowser* logTextBrowser, const char* fmt, ...)
+void plogf(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -29,7 +36,7 @@ void plogf(QTextBrowser* logTextBrowser, const char* fmt, ...)
     return;
 }
 
-void clog(QTextBrowser *logTextBrowser)
+void clog()
 {
     logTextBrowser->clear();
 }

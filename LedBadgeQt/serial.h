@@ -1,6 +1,8 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
+//#define NDEBUG // Comment to disable assertions.
+
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -53,7 +55,8 @@ enum TargetBuffer : uint8_t
     Front   = 1U << 2
 };
 
-int openSerialDevice(const char* deviceName, QTextBrowser* logTextBrowser);
+int openSerialDevice(const char* deviceName);
+int closeSerialDevice();
 int getVersion(uint8_t* buf);
 int pingDevice(uint8_t* buf);
 int pollInputs(uint8_t* buf);
@@ -64,6 +67,7 @@ int getPixel(uint8_t x, uint8_t y, TargetBuffer target);
 int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color);
 int solidFillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t color);
 int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t* buf, size_t len);
+int copyRect(uint8_t srcX, uint8_t srcY, uint8_t width, uint8_t height, uint8_t dstX, uint8_t dstY, TargetBuffer src, TargetBuffer dst);
 int setPowerOnImage();
 
 #endif // SERIAL_H
