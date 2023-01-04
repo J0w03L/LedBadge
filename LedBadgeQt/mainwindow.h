@@ -55,6 +55,10 @@ private slots:
 
     void on_bufferCopyBackToFrontButton_clicked();
 
+    void on_imageLoadImagesButton_clicked();
+
+    void on_imageLoadTestButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     void getScreenBuffer(TargetBuffer target);

@@ -176,7 +176,7 @@ int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer t
     for (int i = 0; i < len; i++)
     {
         uint8_t byte = buf[i];
-        // Swap some bits around.
+        // Swap some bits around. This allows your input data to be in the exact same format as what you would receive from getPixelRect.
         byte = (byte & 0xF0) >> 4 | (byte & 0x0F) << 4;
         byte = (byte & 0xCC) >> 2 | (byte & 0x33) << 2;
         cmd[4 + i] = byte;

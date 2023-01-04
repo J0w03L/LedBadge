@@ -22,6 +22,9 @@ set(PROJECT_SOURCES
         log.cpp
         log.h
         badge.h
+        image.cpp
+        image.h
+        framerate.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -47,7 +50,16 @@ else()
     endif()
 endif()
 
-target_link_libraries(LedBadgeQt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_include_directories(LedBadgeQt PUBLIC ${PNG_INCLUDE_DIR})
+find_package(PNG REQUIRED)
+
+set(PNG_SHARED ON CACHE BOOL "" FORCE)
+set(PNG_STATIC OFF CACHE BOOL "" FORCE)
+set(PNG_EXECUTABLES OFF CACHE BOOL "" FORCE)
+set(PNG_TESTS OFF CACHE BOOL "" FORCE)
+set(SKIP_INSTALL_ALL OFF CACHE BOOL "" FORCE)
+
+target_link_libraries(LedBadgeQt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PUBLIC ${MY_EXEC} ${PNG_LIBRARY})
 
 set_target_properties(LedBadgeQt PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

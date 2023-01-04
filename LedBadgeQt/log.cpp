@@ -14,7 +14,7 @@ void logf(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    char logText[2048];
+    char logText[2048] = {0};
     vsprintf(logText, fmt, args);
     logTextBrowser->append(logText);
     va_end(args);
@@ -28,7 +28,7 @@ void plogf(const char* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    char logText[2048];
+    char logText[2048] = {0};
     vsprintf(logText, fmt, args);
     printf("%s\n", logText);
     logTextBrowser->append(logText);

@@ -2,8 +2,13 @@
 #include "./ui_mainwindow.h"
 #include "serial.h"
 #include "log.h"
+#include "image.h"
+#include "framerate.h"
 #include <algorithm>
 #include <cstring>
+#include <QFileDialog>
+
+extern char** environ;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -62,6 +67,9 @@ void MainWindow::getScreenBuffer(TargetBuffer target)
     return;
 }
 
+/*
+ * TODO: The entire SerialDevice struct isn't really necessary and this code didn't work as originally intended anyway. Remove that struct later.
+*/
 void MainWindow::on_devRefreshButton_clicked()
 {
     closeSerialDevice();
@@ -309,6 +317,56 @@ void MainWindow::on_bufferCopyBackToFrontButton_clicked()
     copyRect(0, 0, B_WIDTH, B_HEIGHT, 0, 0, TargetBuffer::Front, TargetBuffer::Back);
     swapBuffers();
     plogf("Copied back buffer to front!");
+    return;
+}
+
+void MainWindow::on_imageLoadImagesButton_clicked()
+{
+    QStringList openPaths = QFileDialog::getOpenFileNames(this, "Open Images");
+    int openPathsCount = openPaths.size();
+    const std::intmax_t targetFPS = 30;
+    plogf("Displaying images...");
+    frameRate<targetFPS> frameRater;
+    for (int i = 0; i < openPathsCount; i++)
+    {
+        readPNGFile(openPaths[i].toLatin1().data());
+        reducePNGColors();
+        uint8_t buf[144] = {0};
+        pngMap(buf);
+        fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
+        swapBuffers();
+        freeRowPtrs();
+        frameRater.sleep();
+    }
+    plogf("Done!");
+    return;
+}
+
+
+void MainWindow::on_imageLoadTestButton_clicked()
+{
+    char openPath[65535];
+    strncpy(openPath, QFileDialog::getOpenFileName(this, "Open Image").toLatin1().data(), 65534);
+    printf("openDialog: %s\n", openPath);
+    char savePath[65535];
+    strncpy(savePath, QFileDialog::getSaveFileName(this, "Save Image").toLatin1().data(), 65534);
+    printf("saveDialog: %s\n", savePath);
+    plogf("Opening %s", openPath);
+    readPNGFile(openPath);
+    plogf("Reducing colors...");
+    reducePNGColors();
+    plogf("Reduced colors!");
+    plogf("Mapping...");
+    uint8_t buf[144] = {0};
+    pngMap(buf);
+    plogf("Mapped!");
+    plogf("Drawing to badge...");
+    fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
+    swapBuffers();
+    plogf("Drawn!");
+    plogf("Writing to %s", savePath);
+    writePNGFile(savePath);
+    plogf("Done!");
     return;
 }
 

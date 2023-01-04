@@ -56,3 +56,6 @@ Temporary Items
 # Qtcreator stuff
 build-LedBadgeQt-Desktop-Debug
 build-LedBadgeQt-Desktop-Release
+
+# vscode
+.vscode
