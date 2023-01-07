@@ -28,6 +28,8 @@ int readPNGFile(char *path)
     if (colorType & PNG_COLOR_MASK_ALPHA)                   png_set_strip_alpha(png);               // Remove alpha channels.
     if (colorType & PNG_COLOR_MASK_COLOR)                   png_set_rgb_to_gray(png, 2, -1, -1);    // Reduce to grayscale.
 
+    png_read_update_info(png, pngInfo);
+
     // Read PNG.
     if (rowPtrs) return -4;
     rowPtrs = (png_bytep*) malloc(sizeof(png_bytep) * height);
@@ -158,7 +160,8 @@ int writePNGFile(char *path)
     if (!rowPtrs) return -5;
 
     png_write_image(png, rowPtrs);
-    png_write_end(png, NULL);
+    //png_write_end(png, NULL);
+    png_write_end(png, pngInfo);
     freeRowPtrs();
     fclose(pngFile);
     png_destroy_write_struct(&png, &pngInfo);

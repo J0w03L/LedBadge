@@ -1,6 +1,7 @@
 #include "serial.h"
 
 int serialDevice = 0;
+bool connected = false;
 
 int openSerialDevice(const char* deviceName)
 {
@@ -60,7 +61,13 @@ int openSerialDevice(const char* deviceName)
     int verRead = getVersion(&verBuf);
     plogf("GetVersion result: %i (0x%02x, received %i bytes)", verBuf, verBuf, verRead);
     if (verBuf == 255 || verBuf == 0) return -4;
+    connected = true;
     return 0;
+}
+
+bool isSerialConnected()
+{
+    return connected;
 }
 
 int closeSerialDevice()
@@ -70,7 +77,6 @@ int closeSerialDevice()
 
 int getVersion(uint8_t* buf)
 {
-    printf("getVersion()\n");
     SerialCommand cmd[1] = {SerialCommand::GetVersion};
     write(serialDevice, cmd, sizeof(cmd));
     return read(serialDevice, buf, sizeof(buf));
@@ -78,7 +84,6 @@ int getVersion(uint8_t* buf)
 
 int pingDevice(uint8_t* buf)
 {
-    printf("pingDevice()\n");
     SerialCommand cmd[1] = {SerialCommand::Ping};
     write(serialDevice, cmd, sizeof(cmd));
     return read(serialDevice, buf, sizeof(buf));
@@ -86,7 +91,6 @@ int pingDevice(uint8_t* buf)
 
 int pollInputs(uint8_t* buf)
 {
-    printf("pollInputs()\n");
     SerialCommand cmd[1] = {SerialCommand::PollInputs};
     write(serialDevice, cmd, sizeof(cmd));
     return read(serialDevice, buf, sizeof(buf));
@@ -94,7 +98,6 @@ int pollInputs(uint8_t* buf)
 
 int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target)
 {
-    printf("getPixelRect()\n");
     uint8_t tmp;
     uint8_t bufRead = 0;
     uint8_t cmd[4] = {SerialCommand::GetPixelRect | target, x, width, (y << 4) | height};
@@ -110,7 +113,6 @@ int getPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t heig
 
 int setPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t color)
 {
-    printf("setPixelRect()\n");
     uint8_t tmp;
     uint8_t bufRead = 0;
     uint8_t cmd[4] = {SerialCommand::GetPixelRect | target, x, width, (y << 4) | height};
@@ -126,7 +128,6 @@ int setPixelRect(uint8_t* buf, uint8_t x, uint8_t y, uint8_t width, uint8_t heig
 
 int setBrightness(int brightness)
 {
-    printf("setBrightness()\n");
     uint8_t cmd[2] = {SerialCommand::SetBrightness, static_cast<uint8_t>(brightness)};
     write(serialDevice, cmd, sizeof(cmd));
     return 0;
@@ -134,7 +135,6 @@ int setBrightness(int brightness)
 
 int swapBuffers()
 {
-    printf("swapBuffers()\n");
     uint8_t cmd[1] = {SerialCommand::Swap};
     write(serialDevice, cmd, sizeof(cmd));
     return 0;
@@ -142,7 +142,6 @@ int swapBuffers()
 
 int getPixel(uint8_t x, uint8_t y, TargetBuffer target)
 {
-    printf("setPixel()\n");
     printf("Getting pixel at %i, %i in %s buffer.\n", x, y, (target == TargetBuffer::Front) ? "Front" : "Back");
     uint8_t cmd[3] = {SerialCommand::GetPixel, x, (y << 4) | (target << 2)};
     uint8_t buf[1];
@@ -154,7 +153,6 @@ int getPixel(uint8_t x, uint8_t y, TargetBuffer target)
 
 int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color)
 {
-    printf("setPixel()\n");
     printf("Setting pixel at %i, %i in %s buffer to %i.\n", x, y, (target == TargetBuffer::Front) ? "Front" : "Back", color);
     uint8_t cmd[3] = {SerialCommand::SetPixel, x, (y << 4) | (target << 2) | color};
     write(serialDevice, cmd, sizeof(cmd));
@@ -163,7 +161,6 @@ int setPixel(uint8_t x, uint8_t y, TargetBuffer target, uint8_t color)
 
 int solidFillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t color)
 {
-    printf("solidFillRect()\n");
     uint8_t cmd[4] = {SerialCommand::SolidFill | (target << 2) | color, x, width, (y << 4) | height};
     write(serialDevice, cmd, sizeof(cmd));
     return 0;
@@ -171,7 +168,6 @@ int solidFillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuf
 
 int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer target, uint8_t* buf, size_t len)
 {
-    printf("fillRect()\n");
     uint8_t cmd[4 + len] = {SerialCommand::Fill | (target << 2), x, width, (y << 4) | height};
     for (int i = 0; i < len; i++)
     {
@@ -187,7 +183,6 @@ int fillRect(uint8_t x, uint8_t y, uint8_t width, uint8_t height, TargetBuffer t
 
 int copyRect(uint8_t srcX, uint8_t srcY, uint8_t width, uint8_t height, uint8_t dstX, uint8_t dstY, TargetBuffer src, TargetBuffer dst)
 {
-    printf("copyRect()\n");
     uint8_t cmd[6] = {SerialCommand::Copy, srcX, dstX, (srcY << 4) | dstY, width, (height << 4) | (dst << 2) | src}; // Not sure why, but the firmware seems to call the destination src and the source dst?
     write(serialDevice, cmd, sizeof(cmd));
     return 0;
@@ -195,7 +190,6 @@ int copyRect(uint8_t srcX, uint8_t srcY, uint8_t width, uint8_t height, uint8_t 
 
 int setPowerOnImage()
 {
-    printf("setPowerOnImage\n");
     uint8_t cmd[1] = {SerialCommand::SetPowerOnImage};
     write(serialDevice, cmd, sizeof(cmd));
     return 0;

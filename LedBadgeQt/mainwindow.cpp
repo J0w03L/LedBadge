@@ -7,8 +7,20 @@
 #include <algorithm>
 #include <cstring>
 #include <QFileDialog>
+#include <QImage>
+#include <QImageReader>
+#include <QStringList>
+#include <chrono>
+#include <unistd.h>
+#include <spawn.h>
+#include <signal.h>
 
 extern char** environ;
+QStringList imagePaths;
+QStringList imageTmpPaths;
+char audioPath[65535] = {0};
+int imagePreviewCurrentFrame = 0;
+int imagePreviewFrameCount = 0;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,6 +33,35 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updateImagePreview(int index)
+{
+    if (index > (imagePreviewFrameCount - 1) || index < 0)
+    {
+        printf("updateImagePreview with out-of-range index!\nimagePreviewFrameCount: %i\nimagePreviewCurrentFrame: %i\nindex: %i\n", imagePreviewFrameCount, imagePreviewCurrentFrame, index);
+        return;
+    }
+    imagePreviewCurrentFrame = index;
+    char frameCountText[50] = {0};
+    sprintf(frameCountText, "%i / %i", imagePreviewCurrentFrame + 1, imagePreviewFrameCount);
+    ui->imagePreviewFrameCountLabel->setText(frameCountText);
+    readPNGFile(imagePaths[imagePreviewCurrentFrame].toLatin1().data());
+    reducePNGColors();
+    char tmpPath[65535] = {0};
+    sprintf(tmpPath, "/tmp/.LedBadgeQt_imgprev_%i.png", imagePreviewCurrentFrame);
+    writePNGFile(tmpPath);
+    imageTmpPaths.append(tmpPath);
+    QLabel* imageLabel = ui->imagePreviewFrameImageLabel;
+    QPixmap pixmap;
+    if (!pixmap.load(tmpPath))
+    {
+        plogf("Failed to load preview image!");
+        return;
+    }
+    pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio);
+    imageLabel->setPixmap(pixmap);
+    return;
 }
 
 void MainWindow::getScreenBuffer(TargetBuffer target)
@@ -54,7 +95,7 @@ void MainWindow::getScreenBuffer(TargetBuffer target)
                         strncat(img, bit1 ? "\u2588" : "\u2593", 4); // 11 = Full Block; 10 = Dark Shade.
                         break;
                     case 0:
-                        strncat(img, bit1 ? "\u2592" : "\u2591", 4); // 01 = Medium Shade; 00 = Light Shade (to keep character spacing equal).
+                        strncat(img, bit1 ? "\u2592" : "\u2591", 4); // 01 = Medium Shade; 00 = Light Shade (to keep character spacing (mostly) equal).
                         break;
                 }
             }
@@ -322,14 +363,56 @@ void MainWindow::on_bufferCopyBackToFrontButton_clicked()
 
 void MainWindow::on_imageLoadImagesButton_clicked()
 {
-    QStringList openPaths = QFileDialog::getOpenFileNames(this, "Open Images");
+    QString filter = tr("PNG (*.png)");
+    QStringList openPaths = QFileDialog::getOpenFileNames(this, "Open Images", "", filter, &filter);
+    if (openPaths.isEmpty())
+    {
+        printf("No image files were selected, not setting.\n");
+        return;
+    }
     int openPathsCount = openPaths.size();
+    if (!imagePaths.isEmpty())
+    {
+        QStringList().swap(imagePaths); // Empty our list by swapping it with a new one.
+    }
+    printf("Copying paths to imagePaths...\n");
+    for (int i = 0; i < openPathsCount; i++)
+    {
+        imagePaths.append(openPaths[i]);
+    }
+    printf("Copying finished (%i / %i)\n", imagePaths.size(), openPathsCount);
+    imagePreviewFrameCount = openPathsCount;
+    imagePreviewCurrentFrame = 0;
+    updateImagePreview(imagePreviewCurrentFrame);
+    return;
+}
+
+
+void MainWindow::on_imageDrawImagesButton_clicked()
+{
+    if (!isSerialConnected())
+    {
+        plogf("You need to connect to a device first.");
+        return;
+    }
+    int openPathsCount = imagePaths.size();
+    if (openPathsCount == 0)
+    {
+        plogf("No images have been loaded, not displaying.");
+        return;
+    }
+    if (!imageTmpPaths.isEmpty())
+    {
+        QStringList().swap(imageTmpPaths); // Empty our list by swapping it with a new one.
+    }
     const std::intmax_t targetFPS = 30;
-    plogf("Displaying images...");
+    plogf("Drawing images...");
     frameRate<targetFPS> frameRater;
     for (int i = 0; i < openPathsCount; i++)
     {
-        readPNGFile(openPaths[i].toLatin1().data());
+        qApp->processEvents();
+        updateImagePreview(i);
+        readPNGFile(imagePaths[i].toLatin1().data());
         reducePNGColors();
         uint8_t buf[144] = {0};
         pngMap(buf);
@@ -338,35 +421,115 @@ void MainWindow::on_imageLoadImagesButton_clicked()
         freeRowPtrs();
         frameRater.sleep();
     }
-    plogf("Done!");
+    plogf("Finished drawing!");
+    printf("Removing temp images...\n");
+    int tmpImageCount = imageTmpPaths.size();
+    for (int i = 0; i < tmpImageCount; i++)
+    {
+        std::remove(imageTmpPaths[i].toLatin1().data());
+    }
     return;
+    printf("Done!\n");
 }
 
 
-void MainWindow::on_imageLoadTestButton_clicked()
+void MainWindow::on_imagePreviewFrameNextButton_clicked()
 {
-    char openPath[65535];
-    strncpy(openPath, QFileDialog::getOpenFileName(this, "Open Image").toLatin1().data(), 65534);
-    printf("openDialog: %s\n", openPath);
-    char savePath[65535];
-    strncpy(savePath, QFileDialog::getSaveFileName(this, "Save Image").toLatin1().data(), 65534);
-    printf("saveDialog: %s\n", savePath);
-    plogf("Opening %s", openPath);
-    readPNGFile(openPath);
-    plogf("Reducing colors...");
-    reducePNGColors();
-    plogf("Reduced colors!");
-    plogf("Mapping...");
-    uint8_t buf[144] = {0};
-    pngMap(buf);
-    plogf("Mapped!");
-    plogf("Drawing to badge...");
-    fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
-    swapBuffers();
-    plogf("Drawn!");
-    plogf("Writing to %s", savePath);
-    writePNGFile(savePath);
-    plogf("Done!");
+    updateImagePreview(imagePreviewCurrentFrame + 1);
+}
+
+
+void MainWindow::on_imagePreviewFrameLastButton_clicked()
+{
+    updateImagePreview(imagePreviewFrameCount - 1);
+}
+
+
+void MainWindow::on_imagePreviewFramePrevButton_clicked()
+{
+    updateImagePreview(imagePreviewCurrentFrame - 1);
+}
+
+
+void MainWindow::on_imagePreviewFrameFirstButton_clicked()
+{
+    updateImagePreview(0);
+}
+
+
+void MainWindow::on_imageLoadAudioButton_clicked()
+{
+   QString path = QFileDialog::getOpenFileName(this, "Open Audio");
+   if (path.isEmpty())
+   {
+       printf("No audio file was selected, not setting.\n");
+       return;
+   }
+   strncpy(audioPath, path.toLatin1().data(), 65535);
+}
+
+
+void MainWindow::on_imageDrawAndPlayButton_clicked()
+{
+    if (!isSerialConnected())
+    {
+        plogf("You need to connect to a device first.");
+        return;
+    }
+    int openPathsCount = imagePaths.size();
+    if (openPathsCount == 0)
+    {
+        plogf("No images have been loaded, not displaying.");
+        return;
+    }
+    if (audioPath[0] == '\0')
+    {
+        plogf("You need to load an audio file first. Use \"Draw Images\" if you don't want audio.");
+        return;
+    }
+    if (!imageTmpPaths.isEmpty())
+    {
+        QStringList().swap(imageTmpPaths); // Empty our list by swapping it with a new one.
+    }
+    pid_t pid;
+    int status;
+    const std::intmax_t targetFPS = 30;
+    plogf("Drawing images...");
+    frameRate<targetFPS> frameRater;
+    char* argv[] = {"ffplay", audioPath, (char*) 0};
+    status = posix_spawn(&pid, "/usr/bin/ffplay", NULL, NULL, argv, environ);
+    if (status != 0)
+    {
+        plogf("Cannot launch ffplay! Make sure that ffplay is installed and is in your PATH!");
+        return;
+    }
+    printf("Started ffplay\n");
+    for (int i = 0; i < openPathsCount; i++)
+    {
+        qApp->processEvents();
+        updateImagePreview(i);
+        readPNGFile(imagePaths[i].toLatin1().data());
+        reducePNGColors();
+        uint8_t buf[144] = {0};
+        pngMap(buf);
+        fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
+        swapBuffers();
+        freeRowPtrs();
+        frameRater.sleep();
+    }
+    if (pid)
+    {
+        kill(pid, SIGQUIT);
+        printf("Stopped ffplay\n");
+    }
+    plogf("Finished drawing!");
+    printf("Removing temp images...\n");
+    int tmpImageCount = imageTmpPaths.size();
+    for (int i = 0; i < tmpImageCount; i++)
+    {
+        std::remove(imageTmpPaths[i].toLatin1().data());
+    }
+    printf("Done!\n");
     return;
 }
 

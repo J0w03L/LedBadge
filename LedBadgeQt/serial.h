@@ -56,6 +56,7 @@ enum TargetBuffer : uint8_t
 };
 
 int openSerialDevice(const char* deviceName);
+bool isSerialConnected();
 int closeSerialDevice();
 int getVersion(uint8_t* buf);
 int pingDevice(uint8_t* buf);

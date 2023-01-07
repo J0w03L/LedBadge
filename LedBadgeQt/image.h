@@ -12,4 +12,5 @@ int writePNGFile(char* path);
 int pngMap(uint8_t* buf);
 int reducePNGColors();
 void freeRowPtrs();
+
 #endif // IMAGE_H

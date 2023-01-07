@@ -57,10 +57,23 @@ private slots:
 
     void on_imageLoadImagesButton_clicked();
 
-    void on_imageLoadTestButton_clicked();
+    void on_imageDrawImagesButton_clicked();
+
+    void on_imagePreviewFrameNextButton_clicked();
+
+    void on_imagePreviewFrameLastButton_clicked();
+
+    void on_imagePreviewFramePrevButton_clicked();
+
+    void on_imagePreviewFrameFirstButton_clicked();
+
+    void on_imageLoadAudioButton_clicked();
+
+    void on_imageDrawAndPlayButton_clicked();
 
 private:
     Ui::MainWindow *ui;
     void getScreenBuffer(TargetBuffer target);
+    void updateImagePreview(int index);
 };
 #endif // MAINWINDOW_H
