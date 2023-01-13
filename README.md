@@ -23,6 +23,10 @@ An attempt at creating a cross-platform version of LedBadge using Qt6.
 ### Windows
 TODO.
 
+## Dependencies
+* Qt6
+* libpng
+
 ## Drivers
 ### Linux
 Most Linux distros since 2005 should already have drivers for badges using the PL2303TA installed. The Linux PL2303TA drivers can be found [here](https://github.com/torvalds/linux/blob/master/drivers/usb/serial/pl2303.c).
