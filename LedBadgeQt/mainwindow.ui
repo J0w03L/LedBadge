@@ -161,9 +161,9 @@
         <widget class="QGroupBox" name="logGroupBox">
          <property name="geometry">
           <rect>
-           <x>790</x>
+           <x>800</x>
            <y>0</y>
-           <width>501</width>
+           <width>491</width>
            <height>541</height>
           </rect>
          </property>
@@ -888,6 +888,118 @@ li.checked::marker { content: &quot;\2612&quot;; }
           </property>
          </widget>
         </widget>
+        <widget class="QGroupBox" name="webcamGroupBox">
+         <property name="geometry">
+          <rect>
+           <x>370</x>
+           <y>250</y>
+           <width>421</width>
+           <height>291</height>
+          </rect>
+         </property>
+         <property name="autoFillBackground">
+          <bool>true</bool>
+         </property>
+         <property name="title">
+          <string>Webcam</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <widget class="QFrame" name="webcamPreviewFrame">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>90</y>
+            <width>401</width>
+            <height>191</height>
+           </rect>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <widget class="QLabel" name="WebcamPreviewFrameImageLabel">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>40</y>
+             <width>384</width>
+             <height>96</height>
+            </rect>
+           </property>
+           <property name="autoFillBackground">
+            <bool>true</bool>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>Webcam Preview</string>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QSpinBox" name="webcamDeviceIDSpinBox">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>50</y>
+            <width>71</width>
+            <height>26</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_6">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>30</y>
+            <width>71</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Device ID:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="webcamOpenButton">
+          <property name="geometry">
+           <rect>
+            <x>90</x>
+            <y>50</y>
+            <width>80</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Open Device</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="webcamDrawButton">
+          <property name="geometry">
+           <rect>
+            <x>270</x>
+            <y>50</y>
+            <width>80</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Draw</string>
+          </property>
+         </widget>
+        </widget>
        </widget>
        <widget class="QWidget" name="tabText">
         <attribute name="title">
@@ -912,12 +1024,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="title">
      <string>Info</string>
     </property>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuDebugging">
     <property name="title">
      <string>Debugging</string>
     </property>
     <addaction name="separator"/>
+    <addaction name="actionDumpToLog"/>
    </widget>
    <addaction name="menuDebugging"/>
    <addaction name="menuInfo"/>
@@ -936,6 +1050,16 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </size>
    </property>
   </widget>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionDumpToLog">
+   <property name="text">
+    <string>Dump to Log</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

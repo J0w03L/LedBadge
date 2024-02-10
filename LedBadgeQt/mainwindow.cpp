@@ -3,13 +3,16 @@
 #include "serial.h"
 #include "log.h"
 #include "image.h"
+#include "webcam.h"
 #include "framerate.h"
 #include <algorithm>
 #include <cstring>
 #include <QFileDialog>
 #include <QImage>
+#include <QPixmap>
 #include <QImageReader>
 #include <QStringList>
+#include <QSysInfo>
 #include <chrono>
 #include <unistd.h>
 #include <spawn.h>
@@ -18,6 +21,7 @@
 extern char** environ;
 QStringList imagePaths;
 QStringList imageTmpPaths;
+Webcam webcam;
 char audioPath[65535] = {0};
 int imagePreviewCurrentFrame = 0;
 int imagePreviewFrameCount = 0;
@@ -531,5 +535,84 @@ void MainWindow::on_imageDrawAndPlayButton_clicked()
     }
     printf("Done!\n");
     return;
+}
+
+
+void MainWindow::on_actionDumpToLog_triggered()
+{
+    QSysInfo sysInfo;
+    QString prettyProductName = sysInfo.prettyProductName();
+    QString currentCpuArchitecture = sysInfo.currentCpuArchitecture();
+    QString kernelType = sysInfo.kernelType();
+    QString kernelVersion = sysInfo.kernelVersion();
+
+    plogf("========== LedBadgeQt Debug ==========");
+    plogf("[ System Information ]");
+    plogf("OS: %s (%s)", detectedOS, prettyProductName.toLatin1().data());
+    plogf("Kernel: %s %s", kernelType.toLatin1().data(), kernelVersion.toLatin1().data());
+    plogf("CPU Architecture: %s", currentCpuArchitecture.toLatin1().data());
+
+    QString buildAbi = sysInfo.buildAbi();
+
+    plogf("\n[ Build Info ]");
+    plogf("Build stamp: %s at %s", __DATE__, __TIME__);
+    plogf("Built for: %s", buildAbi.toLatin1().data());
+}
+
+
+void MainWindow::on_webcamOpenButton_clicked()
+{
+    int devID = ui->webcamDeviceIDSpinBox->value();
+    plogf("Opening webcam %i...", devID);
+
+    webcam.open(devID);
+    webcam.setScale(48, 12);
+
+    QImage previewImage = webcam.getFrame();
+    QPixmap previewPixmap = QPixmap::fromImage(previewImage);
+    ui->WebcamPreviewFrameImageLabel->setPixmap(previewPixmap);
+}
+
+
+void MainWindow::on_webcamDrawButton_clicked()
+{
+    if (!isSerialConnected())
+    {
+        plogf("You need to connect to a device first.");
+        return;
+    }
+    const std::intmax_t targetFPS = 30;
+    plogf("Drawing images...");
+    frameRate<targetFPS> frameRater;
+    while (true)
+    {
+        qApp->processEvents();
+
+        QImage previewImage = webcam.getFrame();
+        QPixmap previewPixmap = QPixmap::fromImage(previewImage);
+        ui->WebcamPreviewFrameImageLabel->setPixmap(previewPixmap);
+
+        /*
+        readPNGFile(imagePaths[i].toLatin1().data());
+        reducePNGColors();
+        */
+
+        uint8_t buf[144] = {0};
+        memImageMap(buf, previewImage.bits(), 48, 12);
+        fillRect(0, 0, B_WIDTH, B_HEIGHT, TargetBuffer::Back, buf, 144);
+        swapBuffers();
+        //freeRowPtrs();
+
+        frameRater.sleep();
+    }
+    plogf("Finished drawing!");
+    printf("Removing temp images...\n");
+    int tmpImageCount = imageTmpPaths.size();
+    for (int i = 0; i < tmpImageCount; i++)
+    {
+        std::remove(imageTmpPaths[i].toLatin1().data());
+    }
+    return;
+    printf("Done!\n");
 }
 

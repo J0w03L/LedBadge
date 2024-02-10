@@ -1,0 +1,9 @@
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/LedBadgeQt.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/edit_cache.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/rebuild_cache.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/list_install_components.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/install.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/install/local.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/install/strip.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/LedBadgeQt_autogen_timestamp_deps.dir
+/home/j0w03l/LedBadge_linux/2/LedBadge/LedBadgeQt/CMakeFiles/LedBadgeQt_autogen.dir

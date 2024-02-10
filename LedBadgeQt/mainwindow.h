@@ -4,6 +4,30 @@
 #include <QMainWindow>
 #include "serial.h"
 
+#ifdef __unix__
+    #ifdef __linux__
+        #define detectedOS "Linux/Unix-based OS"
+    #else
+        #define detectedOS "Other Unix-based OS"
+    #endif
+#else
+    #ifdef _WIN32
+        #ifdef _WIN64
+            #define detectedOS "Windows 64-bit OS"
+        #else
+            #define detectedOS "Windows 32-bit OS"
+        #endif
+    #else
+        #ifdef __APPLE__
+            #define detectedOS "Apple OS"
+        #else
+            #define detectedOS "Unknown OS"
+        #endif
+    #endif
+#endif
+
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -70,6 +94,12 @@ private slots:
     void on_imageLoadAudioButton_clicked();
 
     void on_imageDrawAndPlayButton_clicked();
+
+    void on_actionDumpToLog_triggered();
+
+    void on_webcamOpenButton_clicked();
+
+    void on_webcamDrawButton_clicked();
 
 private:
     Ui::MainWindow *ui;

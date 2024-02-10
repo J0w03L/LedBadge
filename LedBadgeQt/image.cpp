@@ -8,6 +8,7 @@ png_bytep *rowPtrs = NULL;
 int readPNGFile(char *path)
 {
     FILE *pngFile = fopen(path, "rb");
+    //printf("file descriptor: %i\n", fileno(pngFile));
     png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (!png) return -1;
     png_infop pngInfo = png_create_info_struct(png);
@@ -38,8 +39,13 @@ int readPNGFile(char *path)
         rowPtrs[y] = (png_byte*) malloc(png_get_rowbytes(png, pngInfo));
     }
     png_read_image(png, rowPtrs);
-    fclose(pngFile);
     png_destroy_read_struct(&png, &pngInfo, NULL);
+    fclose(pngFile);
+
+    //int flushed = fflush(pngFile);
+    //int closed = fclose(pngFile);
+    //if (closed != 0) printf("closed: %i\n", closed);
+    //printf("flushed: %i\nclosed: %i\n", flushed, closed);
     return 0;
 }
 
@@ -88,6 +94,56 @@ int pngMap(uint8_t* buf)
                 continue;
             }
         }
+    }
+    return 0;
+}
+
+int memImageMap(uint8_t* dst, uint8_t* src, size_t width, size_t height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        uint8_t* row = (uint8_t*)calloc(sizeof(uint8_t), width);
+        memcpy(row, &src[width * y], width);
+        for (int x = 0; x < (width / 4); x++)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                uint8_t px = row[x * 4 + i];
+                if (px < 85)
+                {
+                    if (px >= 43)
+                    {
+                        dst[(y * height) + x] |= 0b01000000 >> (i * 2);
+                        continue;
+                    }
+                    dst[(y * height) + x] |= 0b00000000 >> (i * 2);
+                    continue;
+                }
+                if (px < 170)
+                {
+                    if (px >= 128)
+                    {
+                        dst[(y * height) + x] |= 0b10000000 >> (i * 2);
+                        continue;
+                    }
+                    dst[(y * height) + x] |= 0b01000000 >> (i * 2);
+                    continue;
+                }
+                if (px < 255)
+                {
+                    if (px >= 213)
+                    {
+                        dst[(y * height) + x] |= 0b11000000 >> (i * 2);
+                        continue;
+                    }
+                    dst[(y * height) + x] |= 0b10000000 >> (i * 2);
+                    continue;
+                }
+                dst[(y * height) + x] |= 0b11000000 >> (i * 2);
+                continue;
+            }
+        }
+        free(row);
     }
     return 0;
 }
@@ -163,8 +219,9 @@ int writePNGFile(char *path)
     //png_write_end(png, NULL);
     png_write_end(png, pngInfo);
     freeRowPtrs();
-    fclose(pngFile);
     png_destroy_write_struct(&png, &pngInfo);
+    int closed = fclose(pngFile);
+    printf("tmp closed: %i\n", closed);
     return 0;
 }
 

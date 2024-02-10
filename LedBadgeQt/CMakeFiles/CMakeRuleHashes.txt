@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+c27c5a85b8fd16a2d56b0bdb14733012 CMakeFiles/LedBadgeQt_autogen
+c27c5a85b8fd16a2d56b0bdb14733012 CMakeFiles/LedBadgeQt_autogen_timestamp_deps
+c39bece7486d807d11808b47da71f83d LedBadgeQt_autogen/timestamp

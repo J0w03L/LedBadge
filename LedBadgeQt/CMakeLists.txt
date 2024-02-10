@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
         badge.h
         image.cpp
         image.h
+        webcam.cpp
+        webcam.h
         framerate.h
 )
 
@@ -50,8 +52,11 @@ else()
     endif()
 endif()
 
-target_include_directories(LedBadgeQt PUBLIC ${PNG_INCLUDE_DIR})
 find_package(PNG REQUIRED)
+find_package(HDF5 COMPONENTS C CXX HL REQUIRED)
+find_package(OpenCV REQUIRED)
+
+target_include_directories(LedBadgeQt PUBLIC ${PNG_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 set(PNG_SHARED ON CACHE BOOL "" FORCE)
 set(PNG_STATIC OFF CACHE BOOL "" FORCE)
@@ -59,7 +64,7 @@ set(PNG_EXECUTABLES OFF CACHE BOOL "" FORCE)
 set(PNG_TESTS OFF CACHE BOOL "" FORCE)
 set(SKIP_INSTALL_ALL OFF CACHE BOOL "" FORCE)
 
-target_link_libraries(LedBadgeQt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PUBLIC ${MY_EXEC} ${PNG_LIBRARY})
+target_link_libraries(LedBadgeQt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PUBLIC ${MY_EXEC} ${PNG_LIBRARY} ${HDF5_LIBRARIES} ${HDF5_CXX_LIBRARIES} ${OpenCV_LIBS})
 
 set_target_properties(LedBadgeQt PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
