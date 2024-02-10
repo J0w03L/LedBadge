@@ -65,3 +65,4 @@ CMakeCache.txt
 CMakeFiles/
 CMakeLists.txt.user
 cmake_install.cmake
+*_autogen/
